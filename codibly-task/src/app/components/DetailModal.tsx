@@ -2,22 +2,17 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface DetailModalProps {
   open: boolean;
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
 }
 
-const DetailModal: React.FC<DetailModalProps> = ({ open }) => {
-  const [showFullInfo, setShowFullInfo] = useState<boolean>(false);
-  useEffect(() => {
-    setShowFullInfo(open);
-  }, [open]);
-
-  const handleClose = () => setShowFullInfo(false);
+const DetailModal: React.FC<DetailModalProps> = ({ open, onOpenChange }) => {
   return (
     <>
-      <Modal open={showFullInfo} onClose={handleClose}>
+      <Modal open={open} onClose={() => onOpenChange(false)}>
         <Box
           height={200}
           width={200}
@@ -28,7 +23,7 @@ const DetailModal: React.FC<DetailModalProps> = ({ open }) => {
           p={2}
           sx={{ border: "2px solid grey" }}
         >
-          <TableRow onClick={() => setShowFullInfo(true)}>
+          <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>Name</TableCell>
             <TableCell>year</TableCell>

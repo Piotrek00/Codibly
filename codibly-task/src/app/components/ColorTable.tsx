@@ -11,6 +11,9 @@ import { useEffect, useState } from "react";
 import { Box, Button, Modal, Pagination, Typography } from "@mui/material";
 
 import DetailModal from "./DetailModal";
+import { getColorId, getPage, getPerPage } from "../utils/helper";
+
+const DEFAULT_PER_PAGE = "5";
 
 export interface Product {
   name?: string;
@@ -26,11 +29,13 @@ interface IProductsApiResult {
   data: Product[];
 }
 interface ColorTableTypes {
-  colorId: string;
+  colorId: string | null;
 }
 
 const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
   const [data, setData] = useState<IProductsApiResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccessfullyFetched, setIsSuccessfullyFetched] = useState(false);
   const [page, setPage] = useState<number>(1);
   const [err, setErr] = useState(null);
   const [showInfo, setShowInfo] = useState<boolean>(false);
@@ -48,16 +53,18 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const config = {
+        ...getPage(String(page)),
+        ...getPerPage(DEFAULT_PER_PAGE),
+        ...getColorId(colorId),
+      };
+
+      setIsLoading(true);
+      setIsSuccessfullyFetched(false);
       const result = await fetch(
-        "https://reqres.in/api/products?" +
-          new URLSearchParams({
-            page: String(page),
-            per_page: "5",
-            id: colorId,
-          })
+        "https://reqres.in/api/products?" + new URLSearchParams(config)
       )
         .then((response) => {
-          setData(null);
           if (!response.ok) {
             throw Error("Could not fetch the data...");
           }
@@ -66,8 +73,12 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
         .then((data) => {
           setErr(null);
           setData(data);
+          setIsSuccessfullyFetched(true);
+          setIsLoading(false);
         })
         .catch((err) => {
+          setIsLoading(false);
+          setIsSuccessfullyFetched(false);
           setErr(err.message);
         });
     };
@@ -77,39 +88,45 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
 
   const totalPages: number = data?.total_pages ?? 0;
 
-  console.log(data?.data);
+  const renderTableRow = (item: Product) => {
+    return (
+      <TableRow
+        key={item.id}
+        style={{ backgroundColor: item.color }}
+        onClick={() => setShowInfo(true)}
+      >
+        <TableCell>{item.id}</TableCell>
+        <TableCell>{item.name}</TableCell>
+        <TableCell>{item.year}</TableCell>
+      </TableRow>
+    );
+  };
 
   return (
     <>
-      <TableContainer elevation={5} component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Id</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Year</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {err && <div>{err}</div>}
+      {isLoading && <div>Loading...</div>}
+      {err && <div>{err}</div>}
+      {isSuccessfullyFetched && (
+        <TableContainer elevation={5} component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Id</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Year</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data &&
+                Array.isArray(data.data) &&
+                data.data.map((item) => renderTableRow(item))}
 
-            {data &&
-              Array.isArray(data.data) &&
-              data.data.map((item) => (
-                <TableRow
-                  key={item.id}
-                  style={{ backgroundColor: item.color }}
-                  onClick={() => setShowInfo(true)}
-                >
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.year}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <DetailModal open={showInfo} />
+              {data && !Array.isArray(data.data) && renderTableRow(data.data)}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+      <DetailModal open={showInfo} onOpenChange={setShowInfo} />
 
       {/* <PaginationButtons totalPages={totalPages} page={page} /> */}
 
