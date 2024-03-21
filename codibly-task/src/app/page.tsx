@@ -1,13 +1,15 @@
 "use client";
 import styles from "./page.module.css";
-import Search from "./components/Search";
+import App from "./components/App";
 import ColorTable from "./components/ColorTable";
+import { Pagination } from "@mui/material";
 
 export default function Home() {
   return (
     <main className={styles.main}>
-      <Search />
+      <App />
       {/* <ColorTable /> */}
+      {/* <Pagination /> */}
     </main>
   );
 }

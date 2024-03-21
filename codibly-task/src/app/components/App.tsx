@@ -1,9 +1,10 @@
+"use client";
 import { TextField } from "@mui/material";
 import { useState } from "react";
 import { useDebounce } from "use-debounce";
 import ColorTable from "./ColorTable";
 
-export function Search() {
+export function App() {
   const [id, setId] = useState("");
   const [debouncedId] = useDebounce(id, 350);
 
@@ -27,4 +28,4 @@ export function Search() {
     </>
   );
 }
-export default Search;
+export default App;
