@@ -2,7 +2,6 @@ import { expect, test } from "vitest";
 import { getColorId } from "./helper";
 
 test("should get color id query if present", () => {
-  // AAA
   const colorId = "1";
   const expectedResult = { id: "1" };
 

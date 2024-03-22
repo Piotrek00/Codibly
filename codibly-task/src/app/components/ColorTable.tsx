@@ -8,20 +8,19 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
-import { Box, Button, Modal, Pagination, Typography } from "@mui/material";
-
+import { Box, Typography } from "@mui/material";
 import DetailModal from "./DetailModal";
 import { getColorId, getPage, getPerPage } from "../utils/helper";
+import PaginationButtons from "./PaginationButtons";
 
 const DEFAULT_PER_PAGE = "5";
 
 export interface Product {
-  name?: string;
+  name: string;
   id: string;
-  year?: number;
-  color?: string;
-  pantone_value?: string;
-  description?: string;
+  year: number;
+  color: string;
+  pantone_value: string;
 }
 
 interface IProductsApiResult {
@@ -39,16 +38,10 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
   const [page, setPage] = useState<number>(1);
   const [err, setErr] = useState(null);
   const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<Product | null>(null);
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-  };
-
-  const handlePrevious = () => {
-    setPage(page !== 1 ? page - 1 : page);
-  };
-  const handleNext = () => {
-    setPage(page !== totalPages ? page + 1 : page);
   };
 
   useEffect(() => {
@@ -93,7 +86,10 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
       <TableRow
         key={item.id}
         style={{ backgroundColor: item.color }}
-        onClick={() => setShowInfo(true)}
+        onClick={() => {
+          setSelectedItem(item);
+          setShowInfo(true);
+        }}
       >
         <TableCell>{item.id}</TableCell>
         <TableCell>{item.name}</TableCell>
@@ -104,49 +100,44 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
 
   return (
     <>
-      {isLoading && <div>Loading...</div>}
-      {err && <div>{err}</div>}
-      {isSuccessfullyFetched && (
-        <TableContainer elevation={5} component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Id</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Year</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data &&
-                Array.isArray(data.data) &&
-                data.data.map((item) => renderTableRow(item))}
+      <Box>
+        {isLoading && <Box>Loading...</Box>}
+        {err && (
+          <Box p={5} sx={{ border: "2px solid red", borderRadius: "20px" }}>
+            <Typography color={"red"}>{err}</Typography>
+          </Box>
+        )}
+        {isSuccessfullyFetched && (
+          <TableContainer elevation={5} component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Id</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Year</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data &&
+                  Array.isArray(data.data) &&
+                  data.data.map((item) => renderTableRow(item))}
 
-              {data && !Array.isArray(data.data) && renderTableRow(data.data)}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      <DetailModal open={showInfo} onOpenChange={setShowInfo} />
-
-      {/* <PaginationButtons totalPages={totalPages} page={page} /> */}
-
-      <Box display={"flex"} margin={3}>
-        <Button disabled={page == 1} onClick={handlePrevious}>
-          Back
-        </Button>
-
-        <Pagination
-          hidePrevButton
-          hideNextButton
-          count={totalPages}
-          page={page}
-          size="large"
-          onChange={handleChange}
+                {data && !Array.isArray(data.data) && renderTableRow(data.data)}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+        <DetailModal
+          open={showInfo}
+          onOpenChange={setShowInfo}
+          selectedItem={selectedItem}
         />
 
-        <Button disabled={page == totalPages} onClick={handleNext}>
-          Next
-        </Button>
+        <PaginationButtons
+          totalPages={totalPages}
+          page={page}
+          onChange={handleChange}
+        />
       </Box>
     </>
   );
