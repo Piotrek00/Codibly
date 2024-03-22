@@ -1,48 +1,26 @@
 import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
 import Pagination from "@mui/material/Pagination";
-import { useState } from "react";
 
 interface PaginationButtonsProps {
   totalPages: number;
   page: number;
+  onChange: (event: React.ChangeEvent<unknown>, value: number) => void;
 }
 
 const PaginationButtons: React.FC<PaginationButtonsProps> = ({
   totalPages,
+  page,
+  onChange,
 }) => {
-  const [page, setPage] = useState<number>(1);
-
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
-  };
-
-  const handlePrevious = () => {
-    setPage(page !== 1 ? page - 1 : page);
-  };
-  const handleNext = () => {
-    setPage(page !== totalPages ? page + 1 : page);
-  };
-
   return (
     <>
       <Box display="flex" margin={2}>
-        <Button disabled={page == 1} onClick={handlePrevious}>
-          Back
-        </Button>
-
         <Pagination
-          hidePrevButton
-          hideNextButton
           count={totalPages}
           page={page}
           size="large"
-          onChange={handleChange}
+          onChange={onChange}
         />
-
-        <Button disabled={page == totalPages} onClick={handleNext}>
-          Next
-        </Button>
       </Box>
     </>
   );
