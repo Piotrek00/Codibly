@@ -12,6 +12,7 @@ import { Box, Typography } from "@mui/material";
 import DetailModal from "./DetailModal";
 import { getColorId, getPage, getPerPage } from "../utils/helper";
 import PaginationButtons from "./PaginationButtons";
+import { useRouter } from "next/navigation";
 
 const DEFAULT_PER_PAGE = "5";
 
@@ -32,6 +33,8 @@ interface ColorTableTypes {
 }
 
 const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
+  const router = useRouter();
+
   const [data, setData] = useState<IProductsApiResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccessfullyFetched, setIsSuccessfullyFetched] = useState(false);
@@ -77,7 +80,7 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
     };
 
     fetchData();
-  }, [page, colorId]);
+  }, [colorId, page]);
 
   const totalPages: number = data?.total_pages ?? 0;
 
