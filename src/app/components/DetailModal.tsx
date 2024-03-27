@@ -32,6 +32,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
           display="blockx"
           alignItems="center"
           sx={{ border: "2px solid grey", borderRadius: "10px" }}
+          data-testid="detail-box"
         >
           <Typography
             align="center"
@@ -56,6 +57,7 @@ const DetailModal: React.FC<DetailModalProps> = ({
                 <TableBody>
                   {selectedItem && (
                     <TableRow
+                      data-testid="detail-table-row"
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
                       <TableCell align="center">{selectedItem.id}</TableCell>

@@ -32,6 +32,8 @@ interface ColorTableTypes {
   colorId: string | null;
 }
 
+const API_URL = "https://reqres.in/api/products?";
+
 const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
   const router = useRouter();
 
@@ -57,13 +59,18 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
 
       setIsLoading(true);
       setIsSuccessfullyFetched(false);
-      const result = await fetch(
-        "https://reqres.in/api/products?" + new URLSearchParams(config)
-      )
+      const result = await fetch(API_URL + new URLSearchParams(config))
         .then((response) => {
-          if (!response.ok) {
-            throw Error("Could not fetch the data...");
+          if (response.status >= 500) {
+            // server
+            throw Error("Server error...");
           }
+
+          if (response.status >= 400) {
+            // client
+            throw Error("Client error...");
+          }
+
           return response.json();
         })
         .then((data) => {

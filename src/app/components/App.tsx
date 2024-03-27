@@ -1,17 +1,43 @@
 "use client";
 import { TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import ColorTable from "./ColorTable";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export function App() {
-  const [id, setId] = useState("");
-  const [debouncedId] = useDebounce(id, 500);
+const App = () => {
+  const searchParams = useSearchParams();
+  const query = searchParams.get("id");
+
+  const router = useRouter();
+  const [id, setId] = useState(query ?? "");
+  const [debouncedId] = useDebounce(id, 1500);
+
+  const isMountingRef = useRef(false);
 
   const handleNumber = (event: { target: { value: string } }) => {
     const colorId = event.target.value.replace(/\D/g, "");
     setId(colorId);
   };
+
+  useEffect(() => {
+    isMountingRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!isMountingRef.current) {
+      const params = new URLSearchParams({
+        id: debouncedId,
+        // page: "",
+      });
+
+      router.push(`?${params.toString()}`);
+
+      return;
+    } else {
+      isMountingRef.current = false;
+    }
+  }, [debouncedId, router]);
 
   return (
     <>
@@ -22,7 +48,8 @@ export function App() {
         label="Color ID"
         variant="outlined"
         margin="normal"
-        value={id}
+        defaultValue={debouncedId}
+        // value={id}
         onChange={handleNumber}
       />
       <ColorTable colorId={debouncedId} />
@@ -31,5 +58,6 @@ export function App() {
       </Typography>
     </>
   );
-}
+};
+
 export default App;
