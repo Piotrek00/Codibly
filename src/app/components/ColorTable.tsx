@@ -12,7 +12,6 @@ import { Box, Typography } from "@mui/material";
 import DetailModal from "./DetailModal";
 import { getColorId, getPage, getPerPage } from "../utils/helper";
 import PaginationButtons from "./PaginationButtons";
-import { useRouter } from "next/navigation";
 
 const DEFAULT_PER_PAGE = "5";
 
@@ -35,8 +34,6 @@ interface ColorTableTypes {
 const API_URL = "https://reqres.in/api/products?";
 
 const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
-  const router = useRouter();
-
   const [data, setData] = useState<IProductsApiResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccessfullyFetched, setIsSuccessfullyFetched] = useState(false);
@@ -45,8 +42,11 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<Product | null>(null);
 
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    newPage: number
+  ) => {
+    setPage(newPage);
   };
 
   useEffect(() => {
@@ -62,13 +62,11 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
       const result = await fetch(API_URL + new URLSearchParams(config))
         .then((response) => {
           if (response.status >= 500) {
-            // server
-            throw Error("Server error...");
+            throw Error("There is a problem with server... Try again later");
           }
 
           if (response.status >= 400) {
-            // client
-            throw Error("Client error...");
+            throw Error("Color with this ID does not exist...");
           }
 
           return response.json();
@@ -146,7 +144,7 @@ const ColorTable: React.FC<ColorTableTypes> = ({ colorId }) => {
         <PaginationButtons
           totalPages={totalPages}
           page={page}
-          onChange={handleChange}
+          onChange={handlePageChange}
         />
       </Box>
     </>

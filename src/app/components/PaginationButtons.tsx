@@ -16,6 +16,7 @@ const PaginationButtons: React.FC<PaginationButtonsProps> = ({
     <>
       <Box display="flex" margin={2}>
         <Pagination
+          data-testid="pagination"
           count={totalPages}
           page={page}
           size="large"

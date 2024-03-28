@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Codibly task",
-  description: "Kotarba Piotr",
+  description: "Codibly task",
 };
 
 export default function RootLayout({
