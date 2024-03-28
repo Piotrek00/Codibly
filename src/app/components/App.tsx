@@ -8,11 +8,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 const App = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("id");
-
   const router = useRouter();
   const [id, setId] = useState(query ?? "");
-  const [debouncedId] = useDebounce(id, 1500);
-
+  const [debouncedId] = useDebounce(id, 800);
   const isMountingRef = useRef(false);
 
   const handleNumber = (event: { target: { value: string } }) => {
@@ -28,7 +26,6 @@ const App = () => {
     if (!isMountingRef.current) {
       const params = new URLSearchParams({
         id: debouncedId,
-        // page: "",
       });
 
       router.push(`?${params.toString()}`);
@@ -45,11 +42,10 @@ const App = () => {
         Codibly task
       </Typography>
       <TextField
-        label="Color ID"
+        label="Search by color ID"
         variant="outlined"
         margin="normal"
         defaultValue={debouncedId}
-        // value={id}
         onChange={handleNumber}
       />
       <ColorTable colorId={debouncedId} />
